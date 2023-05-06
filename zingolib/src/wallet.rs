@@ -1183,7 +1183,7 @@ impl LightWallet {
         F: Fn(Box<[u8]>) -> Fut,
         Fut: Future<Output = Result<String, String>>,
     {
-        let start_time = now();
+        // let start_time = now();
         if tos.is_empty() {
             return Err("Need at least one destination address".to_string());
         }
@@ -1204,11 +1204,11 @@ impl LightWallet {
         }
 
         let total_value = tos.iter().map(|to| to.1).sum::<u64>();
-        println!(
-            "0: Creating transaction sending {} ztoshis to {} addresses",
-            total_value,
-            tos.len()
-        );
+        // dbg!(
+        //     "0: Creating transaction sending {} ztoshis to {} addresses",
+        //     total_value,
+        //     tos.len()
+        // );
 
         // Convert address (str) to RecepientAddress and value to Amount
         let recipients = tos
@@ -1243,7 +1243,7 @@ impl LightWallet {
             .collect::<Vec<_>>();
 
         // Select notes to cover the target value
-        println!("{}: Selecting notes", now() - start_time);
+        // dbg!("{}: Selecting notes", now() - start_time);
 
         let target_amount = (Amount::from_u64(total_value).unwrap() + DEFAULT_FEE).unwrap();
         let latest_wallet_height = match self.get_latest_wallet_height().await {
@@ -1271,7 +1271,7 @@ impl LightWallet {
             error!("{}", e);
             return Err(e);
         }
-        println!("Selected notes worth {}", u64::from(selected_value));
+        // dbg!("Selected notes worth {}", u64::from(selected_value));
 
         let orchard_anchor = self
             .get_orchard_anchor(&orchard_notes, latest_wallet_height)
@@ -1281,13 +1281,13 @@ impl LightWallet {
             submission_height,
             orchard_anchor,
         );
-        println!(
-            "{}: Adding {} sapling notes, {} orchard notes, and {} utxos",
-            now() - start_time,
-            sapling_notes.len(),
-            orchard_notes.len(),
-            utxos.len()
-        );
+        // dbg!(
+        //     "{}: Adding {} sapling notes, {} orchard notes, and {} utxos",
+        //     now() - start_time,
+        //     sapling_notes.len(),
+        //     orchard_notes.len(),
+        //     utxos.len()
+        // );
 
         // Add all tinputs
         utxos
@@ -1321,7 +1321,7 @@ impl LightWallet {
             .map_err(|e| format!("{:?}", e))?;
 
         for selected in sapling_notes.iter() {
-            println!("Adding sapling spend");
+            // dbg!("Adding sapling spend");
             if let Err(e) = builder.add_sapling_spend(
                 selected.extsk.clone().unwrap(),
                 selected.diversifier,
@@ -1335,7 +1335,7 @@ impl LightWallet {
         }
 
         for selected in orchard_notes.iter() {
-            println!("Adding orchard spend");
+            // dbg!("Adding orchard spend");
             let path = selected.witness.path().unwrap();
             if let Err(e) = builder.add_orchard_spend::<transaction::fees::fixed::FeeRule>(
                 selected.spend_key.unwrap(),
@@ -1378,7 +1378,7 @@ impl LightWallet {
                 }
             };
 
-            println!("{}: Adding output", now() - start_time);
+            // dbg!("{}: Adding output", now() - start_time);
 
             if let Err(e) = match recipient_address {
                 address::RecipientAddress::Shielded(to) => {
@@ -1430,13 +1430,13 @@ impl LightWallet {
             }
         };
 
-        dbg!(selected_value, target_amount);
+        // dbg!(selected_value, target_amount);
         if let Err(e) = builder.add_sapling_output(
             Some(sapling_ovk.clone()),
             *self.wallet_capability().read().await.addresses()[0]
                 .sapling()
                 .unwrap(),
-            Amount::from_u64(dbg!(u64::from(selected_value) - u64::from(target_amount))).unwrap(),
+            Amount::from_u64(u64::from(selected_value) - u64::from(target_amount)).unwrap(),
             // Here we store the uas we sent to in the memo field.
             // These are used to recover the full UA we sent to.
             MemoBytes::from(Memo::Arbitrary(Box::new(uas_bytes))),
@@ -1460,7 +1460,7 @@ impl LightWallet {
 
         let progress_handle = tokio::spawn(async move {
             while let Some(r) = receiver2.recv().await {
-                println!("{}: Progress: {r}", now() - start_time);
+                // dbg!("{}: Progress: {r}", now() - start_time);
                 progress.write().await.progress = r;
             }
 
@@ -1474,7 +1474,7 @@ impl LightWallet {
             p.total = sapling_notes.len() as u32 + total_z_recipients;
         }
 
-        println!("{}: Building transaction", now() - start_time);
+        // dbg!("{}: Building transaction", now() - start_time);
 
         builder.with_progress_notifier(transmitter);
         let (transaction, _) =
@@ -1491,8 +1491,8 @@ impl LightWallet {
         // Wait for all the progress to be updated
         progress_handle.await.unwrap();
 
-        println!("{}: Transaction created", now() - start_time);
-        println!("Transaction ID: {}", transaction.txid());
+        // dbg!("{}: Transaction created", now() - start_time);
+        // dbg!("Transaction ID: {}", transaction.txid());
 
         {
             self.send_progress.write().await.is_send_in_progress = false;

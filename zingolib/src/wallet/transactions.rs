@@ -436,9 +436,9 @@ impl TransactionMetadataSet {
             .map(|(_, transaction_metadata)| transaction_metadata.txid)
             .collect::<Vec<_>>();
 
-        txids_to_remove
-            .iter()
-            .for_each(|t| println!("Removing expired mempool tx {}", t));
+        // txids_to_remove
+        //     .iter()
+        //     .for_each(|t| dbg!("Removing expired mempool tx {}", t).0);
 
         self.remove_txids(txids_to_remove);
     }

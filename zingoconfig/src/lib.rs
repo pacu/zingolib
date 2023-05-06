@@ -169,7 +169,7 @@ impl ZingoConfig {
             match std::fs::create_dir_all(zcash_data_location.clone()) {
                 Ok(_) => {}
                 Err(e) => {
-                    eprintln!("Couldn't create zcash directory!\n{}", e);
+                    dbg!("Couldn't create zcash directory!\n{}", e);
                     panic!("Couldn't create zcash directory!");
                 }
             };
@@ -206,7 +206,7 @@ impl ZingoConfig {
             match std::fs::create_dir_all(zcash_params.clone()) {
                 Ok(_) => Ok(zcash_params.into_boxed_path()),
                 Err(e) => {
-                    eprintln!("Couldn't create zcash params directory\n{}", e);
+                    dbg!("Couldn't create zcash params directory\n{}", &e);
                     Err(e)
                 }
             }
@@ -257,7 +257,7 @@ impl ZingoConfig {
     pub fn get_log_path(&self) -> Box<Path> {
         let mut log_path = self.get_zingo_wallet_dir().into_path_buf();
         log_path.push(LOGFILE_NAME);
-        //println!("LogFile:\n{}", log_path.to_str().unwrap());
+        //dbg!("LogFile:\n{}", log_path.to_str().unwrap());
 
         log_path.into_boxed_path()
     }
