@@ -347,6 +347,7 @@ to scan from the start of the blockchain."
             x if x.contains("main") => ChainType::Mainnet,
             x if x.contains("test") => ChainType::Testnet,
             x if x.contains("127.0.0.1") => ChainType::Regtest,
+            x if x.contains("localhost") => ChainType::Mainnet,
             _ => panic!("error"),
         };
 

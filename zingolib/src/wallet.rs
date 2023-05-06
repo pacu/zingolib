@@ -1431,12 +1431,12 @@ impl LightWallet {
         };
 
         dbg!(selected_value, target_amount);
-        if let Err(e) = builder.add_orchard_output::<FixedFeeRule>(
-            Some(orchard_ovk.clone()),
+        if let Err(e) = builder.add_sapling_output(
+            Some(sapling_ovk.clone()),
             *self.wallet_capability().read().await.addresses()[0]
-                .orchard()
+                .sapling()
                 .unwrap(),
-            dbg!(u64::from(selected_value) - u64::from(target_amount)),
+            Amount::from_u64(dbg!(u64::from(selected_value) - u64::from(target_amount))).unwrap(),
             // Here we store the uas we sent to in the memo field.
             // These are used to recover the full UA we sent to.
             MemoBytes::from(Memo::Arbitrary(Box::new(uas_bytes))),

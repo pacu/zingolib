@@ -330,7 +330,7 @@ impl std::fmt::Display for ChainType {
             Testnet => "test",
             Regtest => "regtest",
             Mainnet => "main",
-            FakeMainnet => "fakemainnet",
+            FakeMainnet => "main",
         };
         write!(f, "{name}")
     }

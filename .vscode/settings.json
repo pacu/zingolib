@@ -1,5 +1,8 @@
 {
     "rust-analyzer.diagnostics.disabled": [
         "unresolved-macro-call"
+    ],
+    "rust-analyzer.cargo.features": [
+        "darksidewalletd_tests"
     ]
 }
